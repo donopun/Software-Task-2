@@ -6,4 +6,4 @@ A prototype of text based rpg based adventure game inspired by Gregory Yob's Hun
 
 ### Game name: Candy Wars 
 # Idea Implementation
-The game incorporates a ubiqudous OOP system throughout
+The game incorporates a ubiqudous OOP system throughout with deep character immersion and a sophosicated rpg style text based game to create an enjoyable and replayable interactive experience.
