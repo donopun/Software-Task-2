@@ -5,4 +5,5 @@ A prototype of text based rpg based adventure game inspired by Gregory Yob's Hun
 * Teacher Mr McFarlane
 
 ### Game name: Candy Wars 
-
+# Idea Implementation
+The game incorporates a ubiqudous OOP system throughout
