@@ -4,6 +4,7 @@ A prototype of text based rpg based adventure game inspired by Gregory Yob's Hun
 * A student project created by Johnny Chan for Year 11 Software engineering course
 * Teacher Mr McFarlane
 
-### Game name: Candy Wars 
+### Game name: Sweet Stash
 # Idea Implementation
-The game incorporates a ubiqudous OOP system throughout with deep character immersion and a sophosicated rpg style text based game to create an enjoyable and replayable interactive experience.
+Through python, the game incorporates a ubiqudous OOP system throughout with deep character immersion and a sophosicated rpg style text based game to create an enjoyable and replayable interactive experience.
+# Gameplay Cycle 
