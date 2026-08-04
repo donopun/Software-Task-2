@@ -37,3 +37,4 @@ classDiagram
 
     Player "1" -- "1" Region : travels through / trades in
     Region "1" -- "*" NPC : contains
+```
