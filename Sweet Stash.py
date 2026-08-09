@@ -21,7 +21,7 @@ traders as rogue criminals. To the common folk, though, those traders are
 just vigilantes bringing a little flavor back into a dull world.
 
 YOU & YOUR EXILE:
-Growing up in Mountain Village, you were expected to master a honest trade, 
+Growing up in Mountain Village, you were expected to master an honest trade, 
 but you flunked every single apprenticeship you tried. Aimless and restless, 
 you spent your days wandering the outskirts until you stumbled into an old, 
 abandoned waterway and met John. He handed you your first taste of candy 
@@ -61,6 +61,39 @@ BEGINNER'S GUIDE & SMUGGLER RULES:
 """)
     print("=" * 65)
     input("Press Enter to begin your empire...")
+
+def show_victory_screen(net_worth):
+    """Displays the ending lore when the player wins the game."""
+    clear_screen()
+    print("=" * 65)
+    print("🍬 KING OF THE SUGAR GRID — VICTORY 🍬")
+    print("=" * 65)
+    print(f"""
+You stand on the top balcony of your sprawling Newark estate, swirling 
+a glass of spiced cherry syrup.
+
+Your ledger reads a cool ${net_worth:,.2f}.
+
+Remember when you were getting kicked out of Mountain Village with stale 
+fudge crumbs on your boots and your old man yelling from the doorway? 
+Look at you now.
+
+The Crown Magistrates gave up trying to raid your storehouses months ago. 
+Turns out, when you control every distributor from Twixbury to L'darestary, 
+even royalty has to buy their Truffles under the table from your guys. 
+The same guards who used to rattle their batons at you now tip their hats 
+and quietly take their weekly hush-money envelopes.
+
+Even old John showed up yesterday—didn't say much, just left a vintage crate 
+of Sour Worms on your desk, took a slow pull from his pipe, and walked back 
+out into the rain. 
+
+You ran the entire kingdom's grid.
+
+--- GAME OVER: YOU WIN ---
+""")
+    print("=" * 65)
+    input("Press Enter to exit the game...")
 
 class Player:
     def __init__(self):
@@ -298,8 +331,10 @@ class Game:
         while True:
             clear_screen()
             net_worth = self.player.calculate_net_worth(self.prices)
+            
+            # Victory Condition
             if net_worth >= 1000:
-                print(f"🏆 VICTORY! Net Worth hit ${net_worth:.2f}! Your empire dominates the kingdom!")
+                show_victory_screen(net_worth)
                 break
 
             print("="*50)
