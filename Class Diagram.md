@@ -1,40 +1,53 @@
-# Class Diagram - Sweet Stash
-
-```mermaid
-classDiagram
-    class Player {
-        +String name
-        +String current_location
-        +float cash_balance
-        +dict candy_inventory
-        +float empire_wealth
-        +int total_suspicion
-        +move(new_location)
-        +trade_candy(region, candy_type, quantity, is_buying)
-        +buy_shares(region, quantity)
-        +calculate_wealth()
-    }
-
-    class Region {
-        +String region_id
-        +dict market_prices
-        +int security_presence
-        +float share_price
-        +int player_shares_owned
-        +list adjacent_vectors
-        +update_market_prices()
-        +get_adjacent_locations()
-    }
-
-    class NPC {
-        +String npc_id
-        +String assigned_region
-        +int suspicion_level
-        +bool is_supplier
-        +interact(player)
-        +alert_guards()
-    }
-
-    Player "1" -- "1" Region : travels through / trades in
-    Region "1" -- "*" NPC : contains
-```
++-------------------------------------------------------------------------+
+|                               GameEngine                                |
++-------------------------------------------------------------------------+
+| - day: int                                                              |
+| - candy_catalog: dict                                                   |
+| - regions: dict[str, Region]                                            |
+| - current_region: Region                                                |
+| - warden: NPC                                                           |
+| - john: NPC                                                             |
+| - player: Player                                                        |
++-------------------------------------------------------------------------+
+| + update_all_region_markets(): void                                     |
+| + show_intro_lore(): void                                               |
+| + check_guard_encounter(): void                                         |
+| + resolve_combat(num_guards: int): void                                 |
+| + enter_dungeon(): void                                                 |
+| + blacksmith_menu(): void                                               |
+| + display_victory(): void                                               |
+| + start_game_loop(): void                                               |
++-------------------------------------------------------------------------+
+       |                                |                            |
+       | 1                              | 1..* | 1..*
+       v                                v                            v
++-----------------------------+  +------------------------+  +---------------+
+|           Player            |  |         Region         |  |      NPC      |
++-----------------------------+  +------------------------+  +---------------+
+| - cash_balance: float       |  | - name: str            |  | - name: str   |
+| - candy_inventory: dict     |  | - security_presence:int|  | - role: str   |
+| - total_suspicion: int      |  | - share_price: float   |  | - suspicion_  |
+| - min_suspicion_floor: int  |  | - stock: list[str]     |  |   impact: int |
+| - shares_owned: dict        |  | - market_prices: dict  |  +---------------+
+| - hp: int                   |  +------------------------+  | + interact_   |
+| - jail_hits: int            |  | + update_market_       |  |   warden()    |
+| - equipped_weapon: Weapon   |  |   prices(): void       |  +---------------+
+| - guards_defeated: int      |  +------------------------+
+| - prison_escapes: int       |
+| - empire_wealth: float (prop|
++-----------------------------+
+| + trade_candy(region): void |
+| + apply_heat(qty: int): void|
++-----------------------------+
+       |
+       | 0..1
+       v
++-----------------------------+
+|           Weapon            |
++-----------------------------+
+| - name: str                 |
+| - price: float              |
+| - accuracy: float           |
+| - power: int                |
+| - flavor: str               |
++-----------------------------+
