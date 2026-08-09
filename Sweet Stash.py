@@ -6,153 +6,151 @@ def clear_screen():
     """Clears the terminal screen for a clean interface."""
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def show_lore_and_guide():
-    """Displays the intro story and beginner's guide before the game begins."""
-    clear_screen()
-    print("=" * 65)
-    print("🍬 WELCOME TO SWEET STASH: UNDERGROUND CANDY EMPIRE 🍬")
-    print("=" * 65)
-    print("""
-THE LORE & ORIGINS:
-When mass production made sweets absurdly cheap, whole kingdoms hooked 
-themselves on sugar overnight. Fearing civil breakdown, the Crown clamped 
-down hard—banning private production, rationing sugar, and branding sweet 
-traders as rogue criminals. To the common folk, those traders are 
-vigilantes bringing flavor back into a dull world.
+# =============================================================================
+# NPC CLASS
+# =============================================================================
+class NPC:
+    def __init__(self, name, role, suspicion_impact=0):
+        self.name = name
+        self.role = role
+        self.suspicion_impact = suspicion_impact
 
-YOU & YOUR EXILE:
-Growing up in Mountain Village, you were expected to master an honest trade, 
-but you flunked every single apprenticeship you tried. Aimless and restless, 
-you spent your days wandering the outskirts until you stumbled into an old, 
-abandoned waterway and met John. He handed you your first taste of candy 
-and introduced you to the local underground market.
+    def interact_warden(self, day, jail_day, max_days):
+        taunts = [
+            "\"Five days, kid. Pay the bail or become part of the brickwork.\"",
+            "\"No cash, no lockpick skills? Bold strategy for a small-time smuggler.\"",
+            "\"The Crown doesn't care about your sugar syndicate. Neither do I.\"",
+            "\"You look lighter than your ledger. That's a bad combination in here.\"",
+            "\"Every smuggler thinks they're special until the iron door swings shut.\""
+        ]
+        print(f"\n{self.name} steps up to the bars, keys jingling.")
+        print(f"{random.choice(taunts)}")
+        print(f"--- Day {day} (Jail Day {jail_day}/{max_days}) ---\n")
 
-That taste was your downfall. Leaving a few stray crumbs in your room was all 
-it took for your zealously anti-sugar parents to catch on. Heartbroken by your 
-betrayal and fed up with your lack of direction, they cast you out on the spot.
+# =============================================================================
+# REGION CLASS
+# =============================================================================
+class Region:
+    def __init__(self, name, security_presence, share_price, stock):
+        self.name = name
+        self.security_presence = security_presence  # Security Tier 1-3
+        self.share_price = share_price
+        self.stock = stock
+        self.market_prices = {}
 
-With nowhere else to go, you followed John to Gandy. He showed you how to move 
-your first few small-time batches before stepping back to let you build your 
-own operation. In a market flooded with rival dealers, stay sharp—and keep a 
-close eye on John. In this line of work, nothing comes free.
+    def update_market_prices(self, candy_catalog):
+        self.market_prices.clear()
+        for candy in self.stock:
+            base = candy_catalog[candy]["base"]
+            fluctuation = random.uniform(0.85, 1.25)
+            self.market_prices[candy] = max(4, round(base * fluctuation, 2))
 
------------------------------------------------------------------
-BEGINNER'S GUIDE & SMUGGLER RULES:
-1. TRADING CANDY:
-   - Different towns produce and stock different types of sweets!
-   - Buy low in production towns and travel to sell high in wealthy towns.
-   
-2. SUSPICION & HEAT (⚠️) [HARD MODE]:
-   - Trading adds steep suspicion. Larger deals attract heavy heat.
-   - Low Heat (<25): Mild guard patrols (15% encounter rate).
-   - Mid Heat (25-59): Frequent patrols (45% encounter rate).
-   - High Heat (60+): Heavy lockdown (75% encounter rate).
-   - Tip: Escaping prison permanently raises your minimum suspicion floor!
-
-3. WEAPONS & COMBAT (⚔️):
-   - Visit the Blacksmith to buy weapons with better accuracy & power.
-   - If guards attack, you can fight back or bribe them ($20).
-   - Taking 5 hits in combat gets you ARRESTED.
-
-4. DUNGEON & JAILBREAK (🔒):
-   - If arrested, you have 5 days to lockpick your cell or pay bail ($40).
-   - The Warden checks cells on Day 5. Bribes or lockpicks are your only way out.
-""")
-    print("=" * 65)
-    input("Press Enter to begin your empire...")
-
-def show_victory_screen(net_worth, guards_defeated, prison_escapes):
-    """Displays dynamic ending lore based on player stats with unique escape titles."""
-    clear_screen()
-    print("=" * 65)
-    print("🍬 KING OF THE SUGAR GRID — VICTORY 🍬")
-    print("=" * 65)
-    print(f"\nYou stand on the top balcony of your sprawling Newark estate, swirling")
-    print(f"a glass of spiced cherry syrup with a ledger reading ${net_worth:,.2f}.\n")
-
-    print("-" * 65)
-    # Dynamic Escape Narrative Tiers
-    if prison_escapes == 0:
-        print("👑 TITLE EARNED: THE UNTOUCHABLE GHOST")
-        print("The Crown Magistrates don't have a mugshot of you on file.")
-        print("You built a multi-thousand dollar sugar syndicate without touching")
-        print("a dungeon wall. The guards spent years chasing shadows while you built an empire.")
-
-    elif prison_escapes <= 2:
-        print("🔓 TITLE EARNED: THE SLIPPERY SMUGGLER")
-        print(f"Your {prison_escapes} prison breakout(s) are legendary tavern folklore.")
-        print("The guards attempted to lock you up behind cold iron,")
-        print("you picked their locks with rusted sugar tongs and walked right out the front gate.")
-
-    elif prison_escapes <= 4:
-        print("🌀 TITLE EARNED: THE DUNGEON PHANTOM")
-        print(f"With {prison_escapes} jailbreaks under your belt, the wardens started sweating")
-        print("every time you were brought in. You treated their high-security cells like a lounge,")
-        print("lockpicking your way out before your cell door finished swinging shut.")
-
-    else:
-        print("🏰 TITLE EARNED: ARCHITECT OF THE REVOLVING DOOR")
-        print(f"A WHOPPING {prison_escapes} ESCAPES!")
-        print("The Royal High Council gave up trying to keep you imprisoned.")
-        print(f"After escape #{prison_escapes}, the High Warden resigned in humiliation, and the dungeon")
-        print("staff converted your old cell into a public museum dedicated to your legendary runs.")
-        print("Iron bars are useless when the person inside owns the entire kingdom.")
-
-    print("-" * 65)
-
-    # Dynamic Guard Defeat Narrative Tiers
-    if guards_defeated == 0:
-        print("🕊️ COMBAT STYLE: PACIFIST MASTERMIND")
-        print("Not a single guard took a hit from you. Smooth talk, crisp bribes, and ghosting")
-        print("through alleyways kept your hands clean and the Crown's treasury drained.")
-    elif guards_defeated <= 5:
-        print("🥊 COMBAT STYLE: STREET BRAWLER")
-        print(f"With {guards_defeated} guards knocked out across your runs, the local garrisons learned")
-        print("to give your trade routes a wide berth whenever your carriage rolled into town.")
-    else:
-        print("💥 COMBAT STYLE: ENFORCER OF THE ALLEYWAYS")
-        print(f"A trail of {guards_defeated} battered guards left no doubt who ruled the grid.")
-        print("You dismantled Crown authority and broke their patrols to pieces.")
-
-    print("=" * 65)
-    print(f"""
-Old John dropped by yesterday. He left a vintage crate of Sour Worms on your desk, 
-took a slow pull from his pipe, and tipped his hat before fading back into the rain.
-
-You ran the entire kingdom's grid.
-
---- GAME OVER: YOU WIN ---
-""")
-    print("=" * 65)
-    input("Press Enter to exit the game...")
-
+# =============================================================================
+# PLAYER CLASS
+# =============================================================================
 class Player:
     def __init__(self):
-        self.cash = 160.0
-        self.inventory = {
+        self.cash_balance = 160.0
+        self.candy_inventory = {
             "Sour Worms": 0,
             "Fudge": 0,
             "Choco-Bricks": 0,
             "Jawbreakers": 0,
             "Royal Truffles": 0
         }
-        self.suspicion = 0
-        self.min_suspicion = 0  # Dynamic minimum suspicion floor
-        self.shares = {}
+        self.total_suspicion = 0
+        self.min_suspicion_floor = 0
+        self.shares_owned = {}
         self.hp = 100
         self.jail_hits = 0
-        self.weapon = None
-        self.current_town = "Gandy"
+        self.equipped_weapon = None
         
-        # Track stats for custom endings
+        # Stat tracking for dynamic endings
         self.guards_defeated = 0
         self.prison_escapes = 0
 
-    def calculate_net_worth(self, market_prices):
-        candy_val = sum(self.inventory[c] * market_prices.get(c, 0) for c in self.inventory)
-        share_val = sum(count * 50 for count in self.shares.values())
-        return self.cash + candy_val + share_val
+    @property
+    def empire_wealth(self):
+        """Calculates total net worth (Cash + Inventory + Shares)."""
+        # Note: Inventory valuation uses standard base market estimate
+        inv_val = sum(count * 20.0 for count in self.candy_inventory.values())
+        share_val = sum(count * 50.0 for count in self.shares_owned.values())
+        return self.cash_balance + inv_val + share_val
 
+    def trade_candy(self, current_region):
+        """Passed object reference to cleanly handle local market operations."""
+        clear_screen()
+        print(f"--- Market in {current_region.name} ---")
+        print("=" * 45)
+        print(f"💼 CASH BALANCE: ${self.cash_balance:.2f}")
+        print(f"⚠️  TOTAL SUSPICION: {self.total_suspicion}/100 (Floor: {self.min_suspicion_floor})")
+        print("📦 YOUR INVENTORY:")
+        for item, count in self.candy_inventory.items():
+            print(f"   • {item}: {count}")
+        print("=" * 45)
+
+        print("\nLOCAL MARKET PRICES:")
+        for candy, price in current_region.market_prices.items():
+            print(f"- {candy}: ${price:.2f}")
+
+        print("\n1. Buy Sweets")
+        print("2. Sell Sweets")
+        print("3. Return")
+        
+        choice = input("Select option (1-3): ").strip()
+        if choice not in ["1", "2"]:
+            return
+
+        candy_name = input("Enter Candy Name: ").strip().title()
+        if candy_name not in current_region.market_prices:
+            print("\nThat item is not traded in this district.")
+            input("Press Enter to continue...")
+            return
+
+        # Problem 1 Solution: Try/Except input check
+        try:
+            quantity = int(input("Enter Quantity: ").strip())
+            if quantity <= 0:
+                print("\nQuantity must be greater than zero.")
+                input("Press Enter to continue...")
+                return
+        except ValueError:
+            print("\nInvalid quantity. Enter numerical values only.")
+            input("Press Enter to continue...")
+            return
+
+        unit_price = current_region.market_prices[candy_name]
+
+        if choice == "1":  # Buy
+            total_cost = unit_price * quantity
+            if self.cash_balance >= total_cost:
+                self.cash_balance -= total_cost
+                self.candy_inventory[candy_name] += quantity
+                print(f"\nAcquired {quantity} x {candy_name} for ${total_cost:.2f}.")
+                self.apply_heat(quantity)
+            else:
+                print("\nYour wallet is empty. The dealer turns away.")
+
+        elif choice == "2":  # Sell
+            if self.candy_inventory[candy_name] >= quantity:
+                total_earned = unit_price * quantity
+                self.cash_balance += total_earned
+                self.candy_inventory[candy_name] -= quantity
+                print(f"\nOffloaded {quantity} x {candy_name} for ${total_earned:.2f}.")
+                self.apply_heat(quantity)
+            else:
+                print("\nYou don't possess that much stock.")
+        
+        input("Press Enter to continue...")
+
+    def apply_heat(self, quantity):
+        heat_add = 2 if quantity <= 3 else (4 if quantity <= 10 else 8)
+        self.total_suspicion = min(100, self.total_suspicion + heat_add)
+        print(f"⚠️  [Heat +{heat_add}] Suspicion: {self.total_suspicion}/100")
+
+# =============================================================================
+# WEAPON DATA
+# =============================================================================
 class Weapon:
     def __init__(self, name, price, accuracy, power, flavor):
         self.name = name
@@ -162,190 +160,198 @@ class Weapon:
         self.flavor = flavor
 
 WEAPONS = [
-    Weapon("Soggy Licorice Whip", 30, 0.80, 1, "Stings just enough to make a rookie guard reconsider his career choices."),
-    Weapon("Rusty Sugar Tongs", 70, 0.85, 2, "Heavy, sharp, and smells like stale caramel and poor decisions."),
-    Weapon("Hard-Tack Stunner", 130, 0.90, 3, "Stale bread wrapped around a rock. Simple, crude, effective."),
-    Weapon("The Tooth-Extractor", 220, 0.95, 4, "A brutal piece of brass hardware left over from the old dentist guild.")
+    Weapon("Soggy Licorice Whip", 30, 0.80, 1, "Stings enough to make a rookie guard reconsider his career choices."),
+    Weapon("Rusty Sugar Tongs", 70, 0.85, 2, "Heavy, sharp, and smelling of stale caramel and poor decisions."),
+    Weapon("Hard-Tack Stunner", 130, 0.90, 3, "Stale bread wrapped around a rock. Crude, effective."),
+    Weapon("The Tooth-Extractor", 220, 0.95, 4, "A brutal piece of brass hardware from the old dentist guild.")
 ]
 
-TOWNS = {
-    "Gandy": {"security": 1, "share_price": 45, "stock": ["Sour Worms", "Fudge"]},
-    "Twixbury": {"security": 1, "share_price": 45, "stock": ["Sour Worms", "Fudge"]},
-    "Nougate": {"security": 1, "share_price": 40, "stock": ["Fudge", "Choco-Bricks"]},
-    "Simber": {"security": 1, "share_price": 50, "stock": ["Sour Worms", "Choco-Bricks"]},
-    "Caramoor": {"security": 2, "share_price": 55, "stock": ["Fudge", "Choco-Bricks", "Jawbreakers"]},
-    "Choc Block": {"security": 2, "share_price": 60, "stock": ["Choco-Bricks", "Jawbreakers"]},
-    "Newark": {"security": 3, "share_price": 65, "stock": ["Jawbreakers", "Royal Truffles"]},
-    "L'darestary": {"security": 3, "share_price": 70, "stock": ["Jawbreakers", "Royal Truffles"]}
-}
-
-CANDY_CATALOG = {
-    "Sour Worms": {"base": 8, "tier": 1},
-    "Fudge": {"base": 20, "tier": 1},
-    "Choco-Bricks": {"base": 42, "tier": 2},
-    "Jawbreakers": {"base": 85, "tier": 3},
-    "Royal Truffles": {"base": 160, "tier": 4}
-}
-
-# Cynical flavour text for flavor beats
-RANDOM_EVENTS = [
-    "A local official looks the other way. For a fee, of course.",
-    "Someone left a half-eaten Fudge on the curb. You consider selling it anyway.",
-    "A guard glares at you, then realizes he isn't paid enough to care.",
-    "The rain smells like burnt sugar and bad luck.",
-    "John told you loyalty is expensive. You're starting to see his point."
-]
-
-WARDEN_TAUNTS = [
-    "\"Five days, kid. You either pay the tax or you become part of the brickwork.\"",
-    "\"No cash, no lockpick skills? Bold strategy for a small-time smuggler.\"",
-    "\"The Crown doesn't care about your little sugar dream. Neither do I.\"",
-    "\"You look lighter than your ledger. That's a bad combination in here.\"",
-    "\"Every smuggler thinks they're special until the iron swings shut.\""
-]
-
-class Game:
+# =============================================================================
+# GAME ENGINE CLASS
+# =============================================================================
+class GameEngine:
     def __init__(self):
         self.player = Player()
-        self.prices = {}
         self.day = 1
-        self.update_prices()
+        
+        # Catalog setup
+        self.candy_catalog = {
+            "Sour Worms": {"base": 8},
+            "Fudge": {"base": 20},
+            "Choco-Bricks": {"base": 42},
+            "Jawbreakers": {"base": 85},
+            "Royal Truffles": {"base": 160}
+        }
+        
+        # Region setup mapping out Mountain Village history to Newark industrial sector
+        self.regions = {
+            "Gandy": Region("Gandy", 1, 45, ["Sour Worms", "Fudge"]),
+            "Twixbury": Region("Twixbury", 1, 45, ["Sour Worms", "Fudge"]),
+            "Nougate": Region("Nougate", 1, 40, ["Fudge", "Choco-Bricks"]),
+            "Simber": Region("Simber", 1, 50, ["Sour Worms", "Choco-Bricks"]),
+            "Caramoor": Region("Caramoor", 2, 55, ["Fudge", "Choco-Bricks", "Jawbreakers"]),
+            "Choc Block": Region("Choc Block", 2, 60, ["Choco-Bricks", "Jawbreakers"]),
+            "Newark": Region("Newark", 3, 65, ["Jawbreakers", "Royal Truffles"]),
+            "L'darestary": Region("L'darestary", 3, 70, ["Jawbreakers", "Royal Truffles"])
+        }
+        
+        self.current_region = self.regions["Gandy"]
+        self.warden = NPC("Warden Vane", "Head Warden")
+        self.john = NPC("Old John", "Underground Supplier")
+        
+        self.update_all_region_markets()
 
-    def update_prices(self):
-        self.prices.clear()
-        available_candies = TOWNS[self.player.current_town]["stock"]
-        for candy in available_candies:
-            base_price = CANDY_CATALOG[candy]["base"]
-            fluctuation = random.uniform(0.85, 1.25)
-            self.prices[candy] = max(4, round(base_price * fluctuation, 2))
+    def update_all_region_markets(self):
+        for reg in self.regions.values():
+            reg.update_market_prices(self.candy_catalog)
 
-    def add_suspicion(self, quantity):
-        added_sus = 2 if quantity <= 3 else (4 if quantity <= 10 else 8)
-        self.player.suspicion = min(100, self.player.suspicion + added_sus)
-        print(f"\n⚠️  [Suspicion +{added_sus}] Total Heat: {self.player.suspicion}/100 (Floor: {self.player.min_suspicion})")
-        self.check_guard_encounter()
+    def show_intro_lore(self):
+        clear_screen()
+        print("=" * 65)
+        print("🍬 SWEET STASH: UNDERGROUND CANDY EMPIRE 🍬")
+        print("=" * 65)
+        print("""
+CONTEXT & ORIGINS:
+Mass production made sweets absurdly cheap, hooking whole kingdoms overnight. 
+Fearing civil collapse, the aristocracy banned candy production, rationing sugar 
+and branding sweet traders as criminals. Common folk view traders as vigilantes 
+bringing flavor back into a dull world.
+
+EXILE FROM MOUNTAIN VILLAGE:
+Flunking every apprenticeship in Mountain Village, you wandered into an 
+abandoned waterway and met John. He handed you your first taste of sweet 
+contraband and introduced you to the grid. 
+
+Leaving stray crumbs in your room exposed you. Your zealously anti-sugar parents 
+cast you out on the spot. With nowhere left to go, you followed John to Gandy 
+to build your own operation. In a market flooded with rivals, watch your back—and 
+keep an eye on John. Nothing comes free.
+-----------------------------------------------------------------
+GUIDE:
+1. Trade sweets across regions to grow your empire's wealth.
+2. High suspicion triggers guard encounters.
+3. Visit Blacksmiths for combat gear. Bribe or fight off patrols.
+4. If jailed, lockpick or pay bail within 5 days.
+""")
+        print("=" * 65)
+        input("Press Enter to step onto the grid...")
 
     def check_guard_encounter(self):
-        sus = self.player.suspicion
-        if sus < 25:
-            spawn_chance = 0.15
-        elif sus < 60:
-            spawn_chance = 0.45
-        else:
-            spawn_chance = 0.75
+        heat = self.player.total_suspicion
+        spawn_chance = 0.15 if heat < 25 else (0.45 if heat < 60 else 0.75)
 
         if random.random() < spawn_chance:
-            num_guards = 1 if sus < 60 else random.randint(2, 3)
-            print(f"\n🚨 GUARD ALERT! {num_guards} Town Guard(s) spotted your contraband!")
-            input("Press Enter to enter combat...")
-            self.start_combat(num_guards)
+            num_guards = 1 if heat < 60 else random.randint(2, 3)
+            print(f"\n🚨 GUARD PATROL! {num_guards} Crown Guard(s) spotted your stash!")
+            input("Press Enter to engage...")
+            self.resolve_combat(num_guards)
 
-    def start_combat(self, num_guards):
+    def resolve_combat(self, num_guards):
         while num_guards > 0 and self.player.jail_hits < 5:
             clear_screen()
-            print("⚔️  COMBAT INITIATED!")
+            print("⚔️  COMBAT INITIATED")
             print(f"Guards: {num_guards} | HP: {self.player.hp}/100 | Jail Strikes: {self.player.jail_hits}/5")
-            print(f"Weapon: {self.player.weapon.name if self.player.weapon else 'Bare Fists'}\n")
-            print("1. Attack")
-            print("2. Bribe ($20)")
-            
+            w_name = self.player.equipped_weapon.name if self.player.equipped_weapon else "Bare Fists"
+            print(f"Equipped: {w_name}\n")
+            print("1. Strike")
+            print("2. Bribe ($20.00)")
+
             choice = input("Select: ").strip()
-            
             if choice == "1":
-                acc = self.player.weapon.accuracy if self.player.weapon else 0.55
-                power = self.player.weapon.power if self.player.weapon else 1
+                acc = self.player.equipped_weapon.accuracy if self.player.equipped_weapon else 0.55
+                power = self.player.equipped_weapon.power if self.player.equipped_weapon else 1
                 
                 if random.random() <= acc:
                     defeated = min(num_guards, power)
                     num_guards -= defeated
                     self.player.guards_defeated += defeated
-                    print(f"\n💥 Direct hit! Knocked out {defeated} guard(s)!")
+                    print(f"\n💥 Direct hit! Knocked out {defeated} guard(s).")
                 else:
                     dmg = random.randint(5, 10) * num_guards
                     self.player.hp -= dmg
                     self.player.jail_hits += 1
-                    print(f"\n❌ Missed! Guards hit back for {dmg} damage! Arrest Strike {self.player.jail_hits}/5!")
+                    print(f"\n❌ Strike missed! Guards hit back for {dmg} damage. Strike {self.player.jail_hits}/5.")
                 input("Press Enter to continue...")
 
             elif choice == "2":
-                if self.player.cash >= 20:
-                    self.player.cash -= 20
-                    print("\n💰 You bribed the guard and slipped away.")
+                if self.player.cash_balance >= 20.0:
+                    self.player.cash_balance -= 20.0
+                    print("\n💰 You slipped cash into the guard's pocket and stepped into the alley.")
                     input("Press Enter to continue...")
                     return
                 else:
-                    print("\nNot enough cash! The guards laugh at your empty pockets.")
+                    print("\nYour pockets are empty. The guards scoff at your attempt.")
                     input("Press Enter to continue...")
 
         if self.player.jail_hits >= 5:
-            self.go_to_jail()
+            self.enter_dungeon()
         else:
             clear_screen()
-            print("🎉 Guards defeated! You escaped into the alleyway.")
+            print("🎉 Patrol cleared! You melted into the shadows.")
             input("Press Enter to continue...")
 
-    def go_to_jail(self):
+    def enter_dungeon(self):
         jail_days = 0
-        time_limit = 5
+        max_days = 5
 
-        while jail_days < time_limit:
+        while jail_days < max_days:
             clear_screen()
-            print("🔒 ARRESTED! Placed in the municipal dungeons.")
+            print("🔒 ARRESTED! Thrown into the municipal cells.")
             jail_days += 1
             self.day += 1
             
-            # Cynical Warden Interaction
-            taunt = random.choice(WARDEN_TAUNTS)
-            print(f"\nWarden Vane steps up to the bars, keys jingling.")
-            print(f"{taunt}")
-            print(f"\n--- Day {self.day} (Jail Day {jail_days}/{time_limit}) ---\n")
+            # Warden Interaction using NPC Class
+            self.warden.interact_warden(self.day, jail_days, max_days)
+            
             print("1. Lockpick door (50% chance)")
-            print("2. Pay bail ($40)")
+            print("2. Pay bail ($40.00)")
             print("3. Wait out the day")
 
             choice = input("Select: ").strip()
 
             if choice == "1":
                 if random.random() <= 0.50:
-                    print("\n🔓 Picked the lock! You broke out before Vane could turn around!")
+                    print("\n🔓 The mechanism clicks! You broke out before Vane returned.")
                     self.player.jail_hits = 0
                     self.player.prison_escapes += 1
                     
-                    # Each escape permanently increases suspicion floor by +15
-                    self.player.min_suspicion += 15
-                    self.player.suspicion = max(self.player.suspicion, self.player.min_suspicion + 20)
+                    # Permanent minimum suspicion floor increase
+                    self.player.min_suspicion_floor += 15
+                    self.player.total_suspicion = max(self.player.total_suspicion, self.player.min_suspicion_floor + 20)
                     
-                    print(f"⚠️  WANTED OUTLAW! Permanent suspicion floor raised to {self.player.min_suspicion}!")
+                    print(f"⚠️  WANTED OUTLAW! Permanent suspicion floor raised to {self.player.min_suspicion_floor}.")
                     input("Press Enter to continue...")
                     return
                 else:
-                    print("\n❌ Lockpick snapped. Warden Vane chuckles from down the hall.")
+                    print("\n❌ Lockpick snapped. Warden Vane chuckles down the hallway.")
                     input("Press Enter to continue...")
+
             elif choice == "2":
-                if self.player.cash >= 40:
-                    self.player.cash -= 40
-                    print("\n🔑 Paid your bail. Vane takes your purse with a cynical smirk.")
+                if self.player.cash_balance >= 40.0:
+                    self.player.cash_balance -= 40.0
+                    print("\n🔑 Bail processed. Vane pocketed your purse with a smirk.")
                     self.player.jail_hits = 0
-                    self.player.suspicion = max(15, self.player.min_suspicion)
+                    self.player.total_suspicion = max(15, self.player.min_suspicion_floor)
                     input("Press Enter to continue...")
                     return
                 else:
-                    print("\n\"That's not $40,\" Vane says flatly. \"Try again when you're solvent.\"")
+                    print("\n\"That's short of $40,\" Vane says flatly. \"Try again when you have money.\"")
                     input("Press Enter to continue...")
+
             elif choice == "3":
-                print("\nYou sit on the damp straw, watching time run out.")
+                print("\nYou sit on damp straw, watching time run out.")
                 input("Press Enter to continue...")
 
-        # Cynical Game Over Sequence
+        # Execution Game Over
         clear_screen()
         print("=" * 65)
         print("🔒 TIME'S UP IN THE DUNGEON.")
         print("=" * 65)
-        print("\nWarden Vane unlocks the heavy door, shaking his head.")
-        print("\"Five days and not a coin or a decent escape plan. Unfortunate.\"")
-        print("\nTwo heavy guards escort you up the stone stairwell toward the main courtyard.")
-        print("The Crown doesn't waste resources on bankrupt smugglers.")
-        print("\n💀 EXECUTED BY TOWN AUTHORITY. GAME OVER.")
+        print("\nWarden Vane unlocks the iron door, shaking his head.")
+        print("\"Five days, no cash, no escape. Unfortunate.\"")
+        print("\nGuards escort you up stone stairs toward the courtyard.")
+        print("The Crown waste no resources on bankrupt smugglers.")
+        print("\n💀 EXECUTED BY CROWN DECREE. GAME OVER.")
         print("=" * 65)
         sys.exit()
 
@@ -357,136 +363,151 @@ class Game:
             print(f"    └─ \"{w.flavor}\"")
         print("5. Leave\n")
 
-        choice = input("Buy (1-4): ").strip()
+        choice = input("Select gear (1-4): ").strip()
         if choice in ["1", "2", "3", "4"]:
             w = WEAPONS[int(choice) - 1]
-            if self.player.cash >= w.price:
-                self.player.cash -= w.price
-                self.player.weapon = w
-                print(f"\n✅ Bought and equipped {w.name}!")
+            if self.player.cash_balance >= w.price:
+                self.player.cash_balance -= w.price
+                self.player.equipped_weapon = w
+                print(f"\n✅ Equipped {w.name}.")
             else:
-                print("\n❌ The blacksmith eyes your thin purse. \"No credit in this shop.\"")
+                print("\n❌ The blacksmith eyes your thin purse. \"No credit here.\"")
             input("Press Enter to continue...")
 
-    def main_loop(self):
-        show_lore_and_guide()
-        
+    def display_victory(self):
+        clear_screen()
+        print("=" * 65)
+        print("🍬 KING OF THE SUGAR GRID — VICTORY 🍬")
+        print("=" * 65)
+        print(f"\nYou stand on the balcony of your Newark estate, swirling")
+        print(f"spiced cherry syrup with an empire net worth reading ${self.player.empire_wealth:,.2f}.\n")
+        print("-" * 65)
+
+        # Escape Tiers
+        escapes = self.player.prison_escapes
+        if escapes == 0:
+            print("👑 TITLE: THE UNTOUCHABLE GHOST")
+            print("The Magistrates don't have a mugshot on file.")
+            print("You built a syndicate without touching a dungeon wall.")
+        elif escapes <= 2:
+            print("🔓 TITLE: THE SLIPPERY SMUGGLER")
+            print(f"Your {escapes} breakout(s) are tavern folklore.")
+            print("Guards attempted to lock you behind iron; you picked the cell locks and walked out.")
+        elif escapes <= 4:
+            print("🌀 TITLE: THE DUNGEON PHANTOM")
+            print(f"With {escapes} jailbreaks recorded, wardens sweated whenever you were brought in.")
+            print("You treated high-security cells like a lounge, lockpicking out in minutes.")
+        else:
+            print("🏰 TITLE: ARCHITECT OF THE REVOLVING DOOR")
+            print(f"RECORD SET: {escapes} ESCAPES.")
+            print("The Royal High Council gave up trying to keep you imprisoned.")
+            print(f"After escape #{escapes}, Warden Vane resigned in humiliation. Dungeon staff")
+            print("converted your old cell into a public museum dedicated to your runs.")
+            print("Iron bars are useless when the prisoner owns the kingdom.")
+
+        print("-" * 65)
+        # Combat Tiers
+        defeated = self.player.guards_defeated
+        if defeated == 0:
+            print("🕊️ COMBAT: PACIFIST MASTERMIND")
+            print("No guards took hits from you. Bribes and alleyways kept your hands clean.")
+        elif defeated <= 5:
+            print("🥊 COMBAT: STREET BRAWLER")
+            print(f"With {defeated} guards knocked out, garrisons gave your trade routes a wide berth.")
+        else:
+            print("💥 COMBAT: ENFORCER OF THE ALLEYWAYS")
+            print(f"A trail of {defeated} knocked-out guards left no doubt who ruled the grid.")
+            print("You dismantled Crown authority and broke patrol units to pieces.")
+
+        print("=" * 65)
+        print(f"""
+Old John dropped by yesterday. He left a crate of Sour Worms on your desk, 
+took a pull from his pipe, and tipped his hat before fading into the rain.
+
+You ran the entire kingdom's grid.
+
+--- GAME OVER: YOU WIN ---
+""")
+        print("=" * 65)
+        input("Press Enter to exit...")
+
+    def start_game_loop(self):
+        self.show_intro_lore()
+
         while True:
             clear_screen()
-            net_worth = self.player.calculate_net_worth(self.prices)
-            
-            # Victory Condition
-            if net_worth >= 1000:
-                show_victory_screen(net_worth, self.player.guards_defeated, self.player.prison_escapes)
+            current_wealth = self.player.empire_wealth
+
+            if current_wealth >= 1000.0:
+                self.display_victory()
                 break
 
-            print("="*50)
+            print("=" * 50)
             print("🍬 SWEET STASH: UNDERGROUND CANDY EMPIRE 🍬")
-            print("="*50)
-            print(f"Day {self.day} | Location: {self.player.current_town}")
-            print(f"Cash: ${self.player.cash:.2f} | Net Worth: ${net_worth:.2f}")
-            print(f"Suspicion: {self.player.suspicion}/100 (Min Floor: {self.player.min_suspicion})")
-            print(f"Inventory: {self.player.inventory}")
-            print(f"Weapon: {self.player.weapon.name if self.player.weapon else 'Bare Fists'}")
-            
-            # Subtle ambient flavor line
-            if random.random() < 0.30:
-                print(f"💬 \"{random.choice(RANDOM_EVENTS)}\"")
-                
+            print("=" * 50)
+            print(f"Day {self.day} | Location: {self.current_region.name}")
+            print(f"Cash: ${self.player.cash_balance:.2f} | Net Worth: ${current_wealth:.2f}")
+            print(f"Suspicion: {self.player.total_suspicion}/100 (Floor: {self.player.min_suspicion_floor})")
+            print(f"Inventory: {self.player.candy_inventory}")
+            w_name = self.player.equipped_weapon.name if self.player.equipped_weapon else "Bare Fists"
+            print(f"Weapon: {w_name}")
             print("-" * 50)
             print("1. Trade Candy (Local Market)")
             print("2. Visit Blacksmith")
-            print("3. Travel to Next Town")
-            print("4. Buy Town Shares ($50)")
+            print("3. Travel to District")
+            print("4. Buy District Share ($50.00)")
             print("5. Quit\n")
 
-            choice = input("Enter choice (1-5): ").strip()
+            choice = input("Select (1-5): ").strip()
 
             if choice == "1":
-                clear_screen()
-                print(f"--- Market in {self.player.current_town} ---")
-                
-                print("=" * 45)
-                print(f"💼 CASH: ${self.player.cash:.2f}")
-                print(f"⚠️  SUSPICION: {self.player.suspicion}/100 (Floor: {self.player.min_suspicion})")
-                print("📦 YOUR CURRENT STOCK:")
-                for item, count in self.player.inventory.items():
-                    print(f"   • {item}: {count}")
-                print("=" * 45)
-
-                print("\nLOCAL MARKET PRICES:")
-                for c in TOWNS[self.player.current_town]["stock"]:
-                    print(f"- {c}: ${self.prices[c]:.2f}")
-                
-                action = input("\n1. Buy | 2. Sell: ").strip()
-                candy_input = input("Candy Name: ").strip().title()
-                
-                if candy_input in self.prices:
-                    try:
-                        qty = int(input("Quantity: ") or 0)
-                    except ValueError:
-                        qty = 0
-                        print("\nInvalid quantity! Enter numbers only.")
-
-                    if qty > 0:
-                        if action == "1":
-                            cost = self.prices[candy_input] * qty
-                            if self.player.cash >= cost:
-                                self.player.cash -= cost
-                                self.player.inventory[candy_input] += qty
-                                print(f"\nBought {qty} x {candy_input}!")
-                                self.add_suspicion(qty)
-                            else:
-                                print("\nNot enough cash!")
-                                
-                        elif action == "2":
-                            if self.player.inventory[candy_input] >= qty:
-                                earned = self.prices[candy_input] * qty
-                                self.player.cash += earned
-                                self.player.inventory[candy_input] -= qty
-                                print(f"\nSold {qty} x {candy_input} for ${earned:.2f}!")
-                                self.add_suspicion(qty)
-                            else:
-                                print("\nNot enough inventory!")
-                else:
-                    print("\nThat item is not produced or traded in this town!")
-                input("\nPress Enter to continue...")
+                # Calls method passing region object reference as designed in journal
+                self.player.trade_candy(self.current_region)
+                self.check_guard_encounter()
 
             elif choice == "2":
                 self.blacksmith_menu()
 
             elif choice == "3":
                 clear_screen()
-                print("--- Map Travel ---")
-                towns = list(TOWNS.keys())
-                for i, t in enumerate(towns, 1):
-                    stock_str = ", ".join(TOWNS[t]["stock"])
-                    print(f"{i}. {t} (Sec: {TOWNS[t]['security']}) - Sells: [{stock_str}]")
-                t_choice = input("\nSelect destination: ").strip()
-                
-                if t_choice.isdigit() and 1 <= int(t_choice) <= len(towns):
-                    self.player.current_town = towns[int(t_choice) - 1]
-                    self.day += 1
-                    self.update_prices()
-                    self.player.suspicion = max(self.player.min_suspicion, self.player.suspicion - 3)
-                    print(f"\nTraveled to {self.player.current_town}. (Suspicion lowered, Floor: {self.player.min_suspicion})")
-                    input("Press Enter to continue...")
+                print("--- District Map ---")
+                region_keys = list(self.regions.keys())
+                for i, r_name in enumerate(region_keys, 1):
+                    reg = self.regions[r_name]
+                    stock_list = ", ".join(reg.stock)
+                    print(f"{i}. {r_name} (Security: Tier {reg.security_presence}) - Sweets: [{stock_list}]")
+
+                # Problem 1 Solution: Try/Except check for map navigation
+                try:
+                    t_choice = int(input("\nSelect destination (number): ").strip())
+                    if 1 <= t_choice <= len(region_keys):
+                        selected_name = region_keys[t_choice - 1]
+                        self.current_region = self.regions[selected_name]
+                        self.day += 1
+                        self.update_all_region_markets()
+                        self.player.total_suspicion = max(self.player.min_suspicion_floor, self.player.total_suspicion - 3)
+                        print(f"\nArrived in {self.current_region.name}. Suspicion lowered.")
+                    else:
+                        print("\nInvalid district number.")
+                except ValueError:
+                    print("\nEnter numerical choices only.")
+                input("Press Enter to continue...")
 
             elif choice == "4":
-                t = self.player.current_town
-                price = TOWNS[t]["share_price"]
-                if self.player.cash >= price:
-                    self.player.cash -= price
-                    self.player.shares[t] = self.player.shares.get(t, 0) + 1
-                    print(f"\nBought 1 Share in {t}!")
+                reg_name = self.current_region.name
+                cost = self.current_region.share_price
+                if self.player.cash_balance >= cost:
+                    self.player.cash_balance -= cost
+                    self.player.shares_owned[reg_name] = self.player.shares_owned.get(reg_name, 0) + 1
+                    print(f"\nPurchased 1 Share in {reg_name}!")
                 else:
-                    print("\nNot enough cash!")
+                    print("\nNot enough cash balance to acquire shares.")
                 input("Press Enter to continue...")
 
             elif choice == "5":
-                print("Exiting game.")
+                print("Exiting game loop.")
                 break
 
 if __name__ == "__main__":
-    game = Game()
-    game.main_loop()
+    engine = GameEngine()
+    engine.start_game_loop()
