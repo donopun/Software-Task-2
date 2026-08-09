@@ -1,3 +1,4 @@
+```python
 import os
 import random
 import sys
@@ -7,27 +8,41 @@ def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def show_lore_and_guide():
-    """Displays the intro story and beginner's guide before the game begins."""
+    """Displays the updated intro story and beginner's guide before the game begins."""
     clear_screen()
     print("=" * 65)
     print("🍬 WELCOME TO SWEET STASH: UNDERGROUND CANDY EMPIRE 🍬")
     print("=" * 65)
     print("""
-THE LORE:
-The High Sugar Guild and Crown Magistrates have outlawed the private 
-possession and sale of all confectionery. Sugar is now heavily taxed,
-rationed, and controlled by the Crown's elite Anti-Sweets Patrol.
+THE LORE & ORIGINS:
+When mass production made sweets absurdly cheap, whole kingdoms hooked 
+themselves on sugar overnight. Fearing civil breakdown, the Crown clamped 
+down hard—banning private production, rationing sugar, and branding sweet 
+traders as rogue criminals. To the common folk, though, those traders are 
+just vigilantes bringing a little flavor back into a dull world.
 
-You are a rogue confectioner starting in the low-security alleyways 
-of Gandy with just $160 in cash. Your goal: Build an illicit candy empire, 
-outsmart the guards, buy up municipal shares, and reach $1,000 in net 
-worth to buy out the aristocracy.
+YOU & YOUR EXILE:
+Growing up in Mountain Village, you were expected to master a honest trade, 
+but you flunked every single apprenticeship you tried. Aimless and restless, 
+you spent your days wandering the outskirts until you stumbled into an old, 
+abandoned waterway and met John. He handed you your first taste of candy 
+and introduced you to the local underground market.
+
+That taste was your downfall. Leaving a few stray crumbs in your room was all 
+it took for your zealously anti-sugar parents to catch on. Heartbroken by your 
+betrayal and fed up with your lack of direction, they cast you out on the spot.
+
+With nowhere else to go, you followed John to Gandy. He showed you how to move 
+your first few small-time batches before stepping back to let you build your 
+own operation. In a market flooded with rival dealers, you'll need to stay 
+sharp—and keep a close eye on John. In this line of work, nothing comes free.
 
 -----------------------------------------------------------------
 BEGINNER'S GUIDE & SMUGGLER RULES:
 1. TRADING CANDY:
    - Different towns produce and stock different types of sweets!
    - Buy low in production towns and travel to sell high in wealthy towns.
+   - Trade directly at markets, or visit Newark for large-scale supply.
    
 2. SUSPICION & HEAT (⚠️):
    - Trading candy adds suspicion. Larger transactions add more heat.
@@ -264,7 +279,7 @@ class Game:
         print("🗡️  --- LOCAL BLACKSMITH ---")
         for i, w in enumerate(WEAPONS, 1):
             print(f"{i}. {w.name} - ${w.price} | Acc: {int(w.accuracy*100)}% | Defeats: {w.power} guard(s)")
-            print(f"   └─ \"{w.flavor}\"")
+            print(f"    └─ \"{w.flavor}\"")
         print("5. Leave\n")
 
         choice = input("Buy (1-4): ").strip()
@@ -377,3 +392,5 @@ class Game:
 if __name__ == "__main__":
     game = Game()
     game.main_loop()
+
+```
