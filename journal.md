@@ -53,4 +53,36 @@ After getting the story down, I started writing the Python code using OOP classe
 
 
 
+# System Module Flow Hierarchy
+
+The game loop operates under a centralized control pipeline in `main.py` split into four distinct execution phases:
+
+* **[1.0] MAIN CONTROL (`main.py`)**
+  * **[1.1] INITIALISE GAME STATE:** Instantiates the `Player`, `Region`, and `NPC` class objects.
+  * **[1.2] SETUP ENVIRONMENT:** Constructs regional layouts, candy catalog prices, and map connection data.
+  * **[1.3] CORE GAMEPLAY LOOP (Repeats until Win/Loss is True):**
+    * **Phase 1: Environmental Assessment:** Reads current location, retrieves local market prices, and evaluates district security tier.
+    * **Phase 2: Input Processing:** Handles player action choices via `Player.move()`, `Player.trade_candy()`, and `Player.buy_shares()`.
+    * **Phase 3: State Evaluation:** Processes NPC dialogue ticks, updates regional heat/suspicion levels, and evaluates guard encounters.
+    * **Phase 4: Terminal Condition Check:** Evaluates whether `empire_wealth >= 1000.0` (Win) or jail/execution limits are reached (Loss).
+
+
+## Verification & Manual Test Matrix
+
+| Component | Test Case | Action / Input | Expected Result | Outcome |
+| :--- | :--- | :--- | :--- | :--- |
+| **Input Error** | String in Integer Prompt | Entered `"ten"` into item buy quantity | Caught by `ValueError` try/except block; prompts user without crashing loop. | **PASS** |
+| **Fail State** | Dungeon Expiration | Selected `3` (Wait) for 5 consecutive jail days | Warden Vane executes terminal sequence; game exits safely via `sys.exit()`. | **PASS** |
+| **State Persistence**| Prison Escape | Successfully lockpicked cell door | Permanent `min_suspicion_floor` increases by +15 and persists across movement. | **PASS** |
+| **Win State** | Empire Wealth Trigger | Reached $1,000.00 total net worth | Breaks main loop and renders dynamic ending screen based on total escapes and guard kills. | **PASS** |
+
+
+
+# Future Scope & Extensions
+
+If I were to expand this project in a future iteration, I would implement:
+1. **Dynamic Black Market Events:** Random temporary events (e.g., "Sugar Shortage in Simber") that spike specific candy prices by 200% for two days.
+2. **Underground Bank & Loan Sharks:** A system where players can take out high-interest loans from John when broke, adding a daily repayment timer that sends enforcers if missed.
+3. **Infiltration Mechanics:** Allowing players to buy fake ID passes to temporarily bypass security tiers in high-heat districts like Newark.
+
 
