@@ -1,5 +1,3 @@
-Python
-
 import os
 import random
 import sys
@@ -9,7 +7,7 @@ def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def show_lore_and_guide():
-    """Displays the updated intro story and beginner's guide before the game begins."""
+    """Displays the intro story and beginner's guide before the game begins."""
     clear_screen()
     print("=" * 65)
     print("🍬 WELCOME TO SWEET STASH: UNDERGROUND CANDY EMPIRE 🍬")
@@ -330,7 +328,12 @@ class Game:
                 candy_input = input("Candy Name: ").strip().title()
                 
                 if candy_input in self.prices:
-                    qty = int(input("Quantity: ") or 0)
+                    try:
+                        qty = int(input("Quantity: ") or 0)
+                    except ValueError:
+                        qty = 0
+                        print("\nInvalid quantity! Enter numbers only.")
+
                     if qty > 0:
                         if action == "1":
                             cost = self.prices[candy_input] * qty
@@ -393,5 +396,3 @@ class Game:
 if __name__ == "__main__":
     game = Game()
     game.main_loop()
-
-```
