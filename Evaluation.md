@@ -7,16 +7,17 @@
 | **Object-Oriented Architecture** | Yes | Built using clear `Player`, `Region`, and `NPC` classes with encapsulated attributes and methods. |
 | **Dynamic Economy System** | Yes | Market prices update across different towns, giving players a real reason to move around and trade strategically. |
 | **Risk vs. Reward System** | Yes | Higher-value trade zones come with higher guard security, forcing players to balance profit against their total suspicion level. |
-| **Win and Loss Conditions** | Yes | Clear termination triggers: reaching the empire wealth milestone wins the game, while hitting 100 suspicion triggers an arrest. |
+| **Win and Loss Conditions** | Yes | Clear termination triggers: reaching the empire wealth milestone wins the game, while hitting 100 suspicion triggers an arrest. 5 days in jail leads to game over. |
 | **User Input & Error Handling** | Yes | Input validation prevents invalid entries (strings or negative numbers) from crashing the game execution loop. |
 
 ---
 
 ## 2. Project Strengths
 
-- **Clean OOP Design:** Grouping data into distinct objects made managing player assets, regional prices, and NPC stats much cleaner than using unstructured arrays or global variables.
+- **OOP Design:** Grouping data into distinct objects made managing player assets, regional prices, and NPC stats much cleaner than using unstructured arrays or global variables.
 - **Engaging Mechanics:** The balance between managing cash, buying regional shares, and keeping suspicion low creates a fun gameplay loop that matches the original story concept.
 - **Robustness:** The application handles unexpected user inputs smoothly without terminating or corrupting saved state data.
+- ** Creativity:** A genuine and light hearted adventure of subtle cynical undertones
 
 ---
 
