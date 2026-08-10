@@ -82,9 +82,9 @@ class Player:
         clear_screen()
         print(f"--- Market in {current_region.name} ---")
         print("=" * 45)
-        print(f"💼 CASH BALANCE: ${self.cash_balance:.2f}")
-        print(f"⚠️  TOTAL SUSPICION: {self.total_suspicion}/100 (Floor: {self.min_suspicion_floor})")
-        print("📦 YOUR INVENTORY:")
+        print(f" CASH BALANCE: ${self.cash_balance:.2f}")
+        print(f"  TOTAL SUSPICION: {self.total_suspicion}/100 (Floor: {self.min_suspicion_floor})")
+        print(" YOUR INVENTORY:")
         for item, count in self.candy_inventory.items():
             print(f"   • {item}: {count}")
         print("=" * 45)
@@ -146,7 +146,7 @@ class Player:
     def apply_heat(self, quantity):
         heat_add = 2 if quantity <= 3 else (4 if quantity <= 10 else 8)
         self.total_suspicion = min(100, self.total_suspicion + heat_add)
-        print(f"⚠️  [Heat +{heat_add}] Suspicion: {self.total_suspicion}/100")
+        print(f"  [Heat +{heat_add}] Suspicion: {self.total_suspicion}/100")
 
 # =============================================================================
 # WEAPON DATA
@@ -208,7 +208,7 @@ class GameEngine:
     def show_intro_lore(self):
         clear_screen()
         print("=" * 65)
-        print("🍬 SWEET STASH: UNDERGROUND CANDY EMPIRE 🍬")
+        print(" SWEET STASH: UNDERGROUND CANDY EMPIRE ")
         print("=" * 65)
         print("""
 CONTEXT & ORIGINS:
@@ -242,7 +242,7 @@ GUIDE:
 
         if random.random() < spawn_chance:
             num_guards = 1 if heat < 60 else random.randint(2, 3)
-            print(f"\n🚨 GUARD PATROL! {num_guards} Crown Guard(s) spotted your stash!")
+            print(f"\n GUARD PATROL! {num_guards} Crown Guard(s) spotted your stash!")
             input("Press Enter to engage...")
             self.resolve_combat(num_guards)
 
@@ -265,18 +265,18 @@ GUIDE:
                     defeated = min(num_guards, power)
                     num_guards -= defeated
                     self.player.guards_defeated += defeated
-                    print(f"\n💥 Direct hit! Knocked out {defeated} guard(s).")
+                    print(f"\n Direct hit! Knocked out {defeated} guard(s).")
                 else:
                     dmg = random.randint(5, 10) * num_guards
                     self.player.hp -= dmg
                     self.player.jail_hits += 1
-                    print(f"\n❌ Strike missed! Guards hit back for {dmg} damage. Strike {self.player.jail_hits}/5.")
+                    print(f"\n Strike missed! Guards hit back for {dmg} damage. Strike {self.player.jail_hits}/5.")
                 input("Press Enter to continue...")
 
             elif choice == "2":
                 if self.player.cash_balance >= 20.0:
                     self.player.cash_balance -= 20.0
-                    print("\n💰 You slipped cash into the guard's pocket and stepped into the alley.")
+                    print("\n You slipped cash into the guard's pocket and stepped into the alley.")
                     input("Press Enter to continue...")
                     return
                 else:
@@ -287,7 +287,7 @@ GUIDE:
             self.enter_dungeon()
         else:
             clear_screen()
-            print("🎉 Patrol cleared! You melted into the shadows.")
+            print(" Patrol cleared! You melted into the shadows.")
             input("Press Enter to continue...")
 
     def enter_dungeon(self):
@@ -296,7 +296,7 @@ GUIDE:
 
         while jail_days < max_days:
             clear_screen()
-            print("🔒 ARRESTED! Thrown into the municipal cells.")
+            print(" ARRESTED! Thrown into the municipal cells.")
             jail_days += 1
             self.day += 1
             
@@ -311,7 +311,7 @@ GUIDE:
 
             if choice == "1":
                 if random.random() <= 0.50:
-                    print("\n🔓 The mechanism clicks! You broke out before Vane returned.")
+                    print("\n The mechanism clicks! You broke out before Vane returned.")
                     self.player.jail_hits = 0
                     self.player.prison_escapes += 1
                     
@@ -319,17 +319,17 @@ GUIDE:
                     self.player.min_suspicion_floor += 15
                     self.player.total_suspicion = max(self.player.total_suspicion, self.player.min_suspicion_floor + 20)
                     
-                    print(f"⚠️  WANTED OUTLAW! Permanent suspicion floor raised to {self.player.min_suspicion_floor}.")
+                    print(f"  WANTED OUTLAW! Permanent suspicion floor raised to {self.player.min_suspicion_floor}.")
                     input("Press Enter to continue...")
                     return
                 else:
-                    print("\n❌ Lockpick snapped. Warden Vane chuckles down the hallway.")
+                    print("\n Lockpick snapped. Warden Vane chuckles down the hallway.")
                     input("Press Enter to continue...")
 
             elif choice == "2":
                 if self.player.cash_balance >= 40.0:
                     self.player.cash_balance -= 40.0
-                    print("\n🔑 Bail processed. Vane pocketed your purse with a smirk.")
+                    print("\n Bail processed. Vane pocketed your purse with a smirk.")
                     self.player.jail_hits = 0
                     self.player.total_suspicion = max(15, self.player.min_suspicion_floor)
                     input("Press Enter to continue...")
@@ -345,13 +345,13 @@ GUIDE:
         # Execution Game Over
         clear_screen()
         print("=" * 65)
-        print("🔒 TIME'S UP IN THE DUNGEON.")
+        print(" TIME'S UP IN THE DUNGEON.")
         print("=" * 65)
         print("\nWarden Vane unlocks the iron door, shaking his head.")
         print("\"Five days, no cash, no escape. Unfortunate.\"")
         print("\nGuards escort you up stone stairs toward the courtyard.")
         print("The Crown waste no resources on bankrupt smugglers.")
-        print("\n💀 EXECUTED BY CROWN DECREE. GAME OVER.")
+        print("\n EXECUTED BY CROWN DECREE. ITS OVER FOR YOU.")
         print("=" * 65)
         sys.exit()
 
@@ -369,15 +369,15 @@ GUIDE:
             if self.player.cash_balance >= w.price:
                 self.player.cash_balance -= w.price
                 self.player.equipped_weapon = w
-                print(f"\n✅ Equipped {w.name}.")
+                print(f"\n Equipped {w.name}.")
             else:
-                print("\n❌ The blacksmith eyes your thin purse. \"No credit here.\"")
+                print("\n The blacksmith eyes your thin purse. \"No credit here.\"")
             input("Press Enter to continue...")
 
     def display_victory(self):
         clear_screen()
         print("=" * 65)
-        print("🍬 KING OF THE SUGAR GRID — VICTORY 🍬")
+        print(" KING OF THE SUGAR GRID — VICTORY ")
         print("=" * 65)
         print(f"\nYou stand on the balcony of your Newark estate, swirling")
         print(f"spiced cherry syrup with an empire net worth reading ${self.player.empire_wealth:,.2f}.\n")
@@ -386,19 +386,19 @@ GUIDE:
         # Escape Tiers
         escapes = self.player.prison_escapes
         if escapes == 0:
-            print("👑 TITLE: THE UNTOUCHABLE GHOST")
+            print(" TITLE: THE UNTOUCHABLE GHOST")
             print("The Magistrates don't have a mugshot on file.")
             print("You built a syndicate without touching a dungeon wall.")
         elif escapes <= 2:
-            print("🔓 TITLE: THE SLIPPERY SMUGGLER")
+            print(" TITLE: THE SLIPPERY SMUGGLER")
             print(f"Your {escapes} breakout(s) are tavern folklore.")
             print("Guards attempted to lock you behind iron; you picked the cell locks and walked out.")
         elif escapes <= 4:
-            print("🌀 TITLE: THE DUNGEON PHANTOM")
+            print(" TITLE: THE DUNGEON PHANTOM")
             print(f"With {escapes} jailbreaks recorded, wardens sweated whenever you were brought in.")
             print("You treated high-security cells like a lounge, lockpicking out in minutes.")
         else:
-            print("🏰 TITLE: ARCHITECT OF THE REVOLVING DOOR")
+            print(" TITLE: ARCHITECT OF THE REVOLVING DOOR")
             print(f"RECORD SET: {escapes} ESCAPES.")
             print("The Royal High Council gave up trying to keep you imprisoned.")
             print(f"After escape #{escapes}, Warden Vane resigned in humiliation. Dungeon staff")
@@ -412,10 +412,10 @@ GUIDE:
             print("🕊️ COMBAT: PACIFIST MASTERMIND")
             print("No guards took hits from you. Bribes and alleyways kept your hands clean.")
         elif defeated <= 5:
-            print("🥊 COMBAT: STREET BRAWLER")
+            print(" COMBAT: STREET BRAWLER")
             print(f"With {defeated} guards knocked out, garrisons gave your trade routes a wide berth.")
         else:
-            print("💥 COMBAT: ENFORCER OF THE ALLEYWAYS")
+            print(" COMBAT: ENFORCER OF THE ALLEYWAYS")
             print(f"A trail of {defeated} knocked-out guards left no doubt who ruled the grid.")
             print("You dismantled Crown authority and broke patrol units to pieces.")
 
@@ -443,7 +443,7 @@ You ran the entire kingdom's grid.
                 break
 
             print("=" * 50)
-            print("🍬 SWEET STASH: UNDERGROUND CANDY EMPIRE 🍬")
+            print(" SWEET STASH: UNDERGROUND CANDY EMPIRE ")
             print("=" * 50)
             print(f"Day {self.day} | Location: {self.current_region.name}")
             print(f"Cash: ${self.player.cash_balance:.2f} | Net Worth: ${current_wealth:.2f}")
