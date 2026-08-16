@@ -62,6 +62,7 @@ class Player:
         self.min_suspicion_floor = 0
         self.shares_owned = {}
         self.hp = 100
+        self.max_hp = 100
         self.jail_hits = 0
         self.equipped_weapon = None
         
@@ -72,13 +73,11 @@ class Player:
     @property
     def empire_wealth(self):
         """Calculates total net worth (Cash + Inventory + Shares)."""
-        # Note: Inventory valuation uses standard base market estimate
         inv_val = sum(count * 20.0 for count in self.candy_inventory.values())
         share_val = sum(count * 50.0 for count in self.shares_owned.values())
         return self.cash_balance + inv_val + share_val
 
     def trade_candy(self, current_region):
-        """Passed object reference to cleanly handle local market operations."""
         clear_screen()
         print(f"--- Market in {current_region.name} ---")
         print("=" * 45)
@@ -86,7 +85,7 @@ class Player:
         print(f"  TOTAL SUSPICION: {self.total_suspicion}/100 (Floor: {self.min_suspicion_floor})")
         print(" YOUR INVENTORY:")
         for item, count in self.candy_inventory.items():
-            print(f"   • {item}: {count}")
+            print(f"   * {item}: {count}")
         print("=" * 45)
 
         print("\nLOCAL MARKET PRICES:")
@@ -107,7 +106,6 @@ class Player:
             input("Press Enter to continue...")
             return
 
-        # Problem 1 Solution: Try/Except input check
         try:
             quantity = int(input("Enter Quantity: ").strip())
             if quantity <= 0:
@@ -167,6 +165,24 @@ WEAPONS = [
 ]
 
 # =============================================================================
+# BOSS CLASS
+# =============================================================================
+class Boss:
+    def __init__(self, player_wealth):
+        self.name = "Old John"
+        self.role = "Grid Architect"
+        # Scales stats dynamically off player net worth
+        self.max_hp = int(150 + (player_wealth * 0.25))
+        self.hp = self.max_hp
+        self.base_damage = int(12 + (player_wealth * 0.02))
+
+    def get_health_bar(self):
+        bar_length = 20
+        filled = int((self.hp / self.max_hp) * bar_length)
+        bar = '[' + '=' * filled + ' ' * (bar_length - filled) + ']'
+        return f"{bar} {self.hp}/{self.max_hp} HP"
+
+# =============================================================================
 # GAME ENGINE CLASS
 # =============================================================================
 class GameEngine:
@@ -174,7 +190,6 @@ class GameEngine:
         self.player = Player()
         self.day = 1
         
-        # Catalog setup
         self.candy_catalog = {
             "Sour Worms": {"base": 8},
             "Fudge": {"base": 20},
@@ -183,7 +198,6 @@ class GameEngine:
             "Royal Truffles": {"base": 160}
         }
         
-        # Region setup mapping out Mountain Village history to Newark industrial sector
         self.regions = {
             "Gandy": Region("Gandy", 1, 45, ["Sour Worms", "Fudge"]),
             "Twixbury": Region("Twixbury", 1, 45, ["Sour Worms", "Fudge"]),
@@ -249,7 +263,7 @@ GUIDE:
     def resolve_combat(self, num_guards):
         while num_guards > 0 and self.player.jail_hits < 5:
             clear_screen()
-            print("⚔️  COMBAT INITIATED")
+            print("--- COMBAT INITIATED ---")
             print(f"Guards: {num_guards} | HP: {self.player.hp}/100 | Jail Strikes: {self.player.jail_hits}/5")
             w_name = self.player.equipped_weapon.name if self.player.equipped_weapon else "Bare Fists"
             print(f"Equipped: {w_name}\n")
@@ -300,7 +314,6 @@ GUIDE:
             jail_days += 1
             self.day += 1
             
-            # Warden Interaction using NPC Class
             self.warden.interact_warden(self.day, jail_days, max_days)
             
             print("1. Lockpick door (50% chance)")
@@ -315,7 +328,6 @@ GUIDE:
                     self.player.jail_hits = 0
                     self.player.prison_escapes += 1
                     
-                    # Permanent minimum suspicion floor increase
                     self.player.min_suspicion_floor += 15
                     self.player.total_suspicion = max(self.player.total_suspicion, self.player.min_suspicion_floor + 20)
                     
@@ -342,7 +354,6 @@ GUIDE:
                 print("\nYou sit on damp straw, watching time run out.")
                 input("Press Enter to continue...")
 
-        # Execution Game Over
         clear_screen()
         print("=" * 65)
         print(" TIME'S UP IN THE DUNGEON.")
@@ -357,10 +368,10 @@ GUIDE:
 
     def blacksmith_menu(self):
         clear_screen()
-        print("🗡️  --- LOCAL BLACKSMITH ---")
+        print("--- LOCAL BLACKSMITH ---")
         for i, w in enumerate(WEAPONS, 1):
             print(f"{i}. {w.name} - ${w.price} | Acc: {int(w.accuracy*100)}% | Defeats: {w.power} guard(s)")
-            print(f"    └─ \"{w.flavor}\"")
+            print(f"    -- \"{w.flavor}\"")
         print("5. Leave\n")
 
         choice = input("Select gear (1-4): ").strip()
@@ -374,16 +385,122 @@ GUIDE:
                 print("\n The blacksmith eyes your thin purse. \"No credit here.\"")
             input("Press Enter to continue...")
 
+    def trigger_boss_encounter(self):
+        """Secret cheat encounter with scaling difficulty and scripted boss sequence."""
+        boss = Boss(self.player.empire_wealth)
+        
+        clear_screen()
+        print("=" * 65)
+        print(" ... ")
+        print(" ... ")
+        print(" ... ")
+        print("=" * 65)
+        print("\nYou step behind the abandoned distillery, expecting a shipment.")
+        print("Old John leans against the damp brickwork, tossing a heavy brass key.")
+        print("\n\"You got greedy kid,\" John says, spitting onto the cobbles.")
+        print("\"Suddenly, he lunges at you with a cane.\"")
+        print("\"I built this pipeline. I won't let a stray like you blow it up.\"")
+        print("=" * 65)
+        input("Press Enter to initiate battle...")
+
+        # Turn-based RPG Loop
+        turn = 1
+        while boss.hp > 0 and self.player.hp > 0:
+            clear_screen()
+            # Scripted interruption when John is near defeat
+            if boss.hp <= boss.max_hp * 0.15:
+                print("=========================================================")
+                print("           *** ENEMY TURN - INTERRUPT ***                ")
+                print("=========================================================")
+                print(f" {boss.name.upper()} {boss.get_health_bar()}")
+                print(f" PLAYER      [{'=' * int((self.player.hp/self.player.max_hp)*20)}] {self.player.hp}/{self.player.max_hp} HP")
+                print("=========================================================\n")
+                print("Old John drops his cane. He doesn't bleed. He doesn't flinch.")
+                print("He wipes a speck of dust off his coat and looks you dead in the eye.\n")
+                print("\"You think you could win?\" John says.")
+                print("\nBefore you can pull your weapon, John moves faster than breath.")
+                print("A heavy iron cosh catches you across the temple.")
+                print("The grid blurs. The cobbles rush up to meet your face.")
+                print("\n[ CRITICAL DAMAGE: 9999 ]")
+                self.player.hp = 0
+                input("\nPress Enter...")
+                break
+
+            # RPG Battle UI Display
+            print("=========================================================")
+            print(f" TURN {turn} - BOSS ENGAGEMENT")
+            print("=========================================================")
+            print(f" {boss.name.upper()} ({boss.role})")
+            print(f" {boss.get_health_bar()}")
+            print("-" * 57)
+            
+            p_bar = int((self.player.hp / self.player.max_hp) * 20)
+            print(f" PLAYER STATUS")
+            print(f" [{('=' * p_bar).ljust(20)}] {self.player.hp}/{self.player.max_hp} HP")
+            w_name = self.player.equipped_weapon.name if self.player.equipped_weapon else "Fists"
+            print(f" Weapon: {w_name}")
+            print("=========================================================")
+            print("1. Weapon Strike")
+            print("2. Desperate Pocket Sand")
+            print("3. Attempt Retraction")
+            print("---------------------------------------------------------")
+            
+            action = input("Execute command (1-3): ").strip()
+            
+            if action == "1":
+                acc = self.player.equipped_weapon.accuracy if self.player.equipped_weapon else 0.50
+                pwr = self.player.equipped_weapon.power * 15 if self.player.equipped_weapon else 10
+                
+                if random.random() <= acc:
+                    damage = random.randint(pwr, pwr + 12)
+                    boss.hp -= damage
+                    print(f"\n> You landed a hit with {w_name} for {damage} damage.")
+                else:
+                    print(f"\n> You swung wildly. John parried it effortlessly.")
+                    
+            elif action == "2":
+                damage = random.randint(3, 8)
+                boss.hp -= damage
+                print(f"\n> You threw pocket grit. John grunts, taking {damage} raw damage.")
+                
+            elif action == "3":
+                print(f"\n> John laughs dryly. \"Nobody walks away from the grid.\"")
+
+            # Boss Attack Counter
+            if boss.hp > boss.max_hp * 0.15:
+                john_dmg = random.randint(boss.base_damage - 3, boss.base_damage + 5)
+                self.player.hp -= john_dmg
+                print(f"> Old John counters with a reinforced cane strike for {john_dmg} damage.")
+                turn += 1
+                input("\nPress Enter to next turn...")
+
+        # Scripted Game Over / Epilogue
+        clear_screen()
+        print("=" * 65)
+        print(" GRID ERASURE - TERMINAL LOSS, ITS OVER ")
+        print("=" * 65)
+        print("\nYou wake up face down in cold water. Your coat is gone.")
+        print("Your ledger, your stock, your purse—all cleared out.")
+        print("Old John stands under the streetlamp, lighting a thin cigar.")
+        print("\n\"You were useful for a month,\" John says, flicking the match onto your chest.")
+        print("\"Now you're loose end.\"")
+        print("\nTwo shadowy figures step out from the alley behind him.")
+        print("They pull heavy canvas sacks over your head and drag you down stone steps.")
+        print("The iron doors lock from the outside.")
+        print("No trial. No bail. No ledger record ever existed.")
+        print("\n--- YOU WERE WIPED FROM THE GRID ---")
+        print("=" * 65)
+        sys.exit()
+
     def display_victory(self):
         clear_screen()
         print("=" * 65)
-        print(" KING OF THE SUGAR GRID — VICTORY ")
+        print(" KING OF THE SUGAR GRID - VICTORY ")
         print("=" * 65)
         print(f"\nYou stand on the balcony of your Newark estate, swirling")
         print(f"spiced cherry syrup with an empire net worth reading ${self.player.empire_wealth:,.2f}.\n")
         print("-" * 65)
 
-        # Escape Tiers
         escapes = self.player.prison_escapes
         if escapes == 0:
             print(" TITLE: THE UNTOUCHABLE GHOST")
@@ -406,10 +523,9 @@ GUIDE:
             print("Iron bars are useless when the prisoner owns the kingdom.")
 
         print("-" * 65)
-        # Combat Tiers
         defeated = self.player.guards_defeated
         if defeated == 0:
-            print("🕊️ COMBAT: PACIFIST MASTERMIND")
+            print(" COMBAT: PACIFIST MASTERMIND")
             print("No guards took hits from you. Bribes and alleyways kept your hands clean.")
         elif defeated <= 5:
             print(" COMBAT: STREET BRAWLER")
@@ -460,8 +576,11 @@ You ran the entire kingdom's grid.
 
             choice = input("Select (1-5): ").strip()
 
-            if choice == "1":
-                # Calls method passing region object reference as designed in journal
+            # CHEAT CODE TRIGGER
+            if choice == "666" or choice.lower() == "john":
+                self.trigger_boss_encounter()
+
+            elif choice == "1":
                 self.player.trade_candy(self.current_region)
                 self.check_guard_encounter()
 
@@ -477,7 +596,6 @@ You ran the entire kingdom's grid.
                     stock_list = ", ".join(reg.stock)
                     print(f"{i}. {r_name} (Security: Tier {reg.security_presence}) - Sweets: [{stock_list}]")
 
-                # Problem 1 Solution: Try/Except check for map navigation
                 try:
                     t_choice = int(input("\nSelect destination (number): ").strip())
                     if 1 <= t_choice <= len(region_keys):
@@ -509,5 +627,5 @@ You ran the entire kingdom's grid.
                 break
 
 if __name__ == "__main__":
-    engine = GameEngine()
-    engine.start_game_loop()
+    game = GameEngine()
+    game.start_game_loop()
