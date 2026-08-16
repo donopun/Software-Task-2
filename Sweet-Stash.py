@@ -659,6 +659,8 @@ GUIDE:
         print("under a flickering streetlamp, lighting a thin cigar.")
         print("John returns an ominous glare")
         print('"Now you\'re just a loose end."')
+        print("Usually I would deflower you.")
+        print("But that is only for those worthy enough...")
         print("\nTwo figures step out from the alley shadows.")
         print("Canvas sacks cover your head as rope binds your wrists.")
         print("They drag you down steep stone steps into absolute darkness.")
